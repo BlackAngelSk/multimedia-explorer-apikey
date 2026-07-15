@@ -6,6 +6,7 @@ import { useOpenRouterAuth } from "@/hooks/use-openrouter-auth";
 import type { BrandData } from "@/components/moodboard";
 import AccordionCards from "@/components/accordion-cards";
 import GenerateForm from "@/components/generate-form";
+import ApiKeyInput from "@/components/api-key-input";
 import ImageResult from "@/components/image-result";
 import HistoryTimeline from "@/components/history-timeline";
 import {
@@ -61,6 +62,8 @@ export default function Home() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [loadingVideo, setLoadingVideo] = useState(false);
   const [showWhatIsThis, setShowWhatIsThis] = useState(false);
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [duration, setDuration] = useState(5);
   const [generateAudio, setGenerateAudio] = useState(false);
 
@@ -97,6 +100,11 @@ export default function Home() {
     resolution: string;
     mediaResult: MediaResult | null;
   } | null>(null);
+
+  // Track mount status to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auto-select first image model once loaded (if no model set yet)
   useEffect(() => {
@@ -498,13 +506,41 @@ export default function Home() {
             >
               [ ? ]
             </button>
-            {apiKey ? (
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2.5 text-xs tracking-wide rounded-lg border border-border text-muted hover:text-foreground hover:border-accent/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-all cursor-pointer"
-              >
-                Sign out
-              </button>
+            {mounted ? (
+              apiKey ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+                    className="px-3 py-2.5 text-xs tracking-wide rounded-lg border border-border text-muted hover:text-foreground hover:border-accent/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-all cursor-pointer"
+                    title="Manage API key"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                    </svg>
+                  </button>
+                  {showApiKeyInput && <ApiKeyInput />}
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2.5 text-xs tracking-wide rounded-lg border border-border text-muted hover:text-foreground hover:border-accent/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-all cursor-pointer"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <SignInButton variant="default" size="sm" />
+                  <button
+                    onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+                    className="px-3 py-2.5 text-xs tracking-wide rounded-lg border border-border text-muted hover:text-foreground hover:border-accent/40 hover:shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-all cursor-pointer"
+                    title="Enter API key"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                    </svg>
+                  </button>
+                  {showApiKeyInput && <ApiKeyInput />}
+                </div>
+              )
             ) : (
               <SignInButton variant="default" size="sm" />
             )}

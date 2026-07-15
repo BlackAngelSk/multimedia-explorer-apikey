@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { SignInButton } from "./auth-button";
+import ApiKeyInput from "./api-key-input";
 
 export default function AuthPrompt({
   onDismiss,
 }: {
   onDismiss: () => void;
 }) {
+  const [showApiKey, setShowApiKey] = useState(false);
+
   return (
     <div className="relative p-5 bg-accent/5 border border-accent/20 rounded-xl space-y-3 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
       <button
@@ -21,9 +25,19 @@ export default function AuthPrompt({
         </svg>
       </button>
       <p className="text-sm text-foreground/90 pr-6 tracking-wide">
-        You must sign in with OpenRouter to generate media.
+        You must sign in with OpenRouter or enter an API key to generate media.
       </p>
-      <SignInButton variant="default" size="sm" />
+      <div className="space-y-3">
+        <SignInButton variant="default" size="sm" />
+        <button
+          type="button"
+          onClick={() => setShowApiKey(!showApiKey)}
+          className="text-xs text-muted hover:text-accent transition-colors cursor-pointer tracking-wide underline-offset-4 hover:underline"
+        >
+          {showApiKey ? "Hide API key input" : "Or enter your API key manually"}
+        </button>
+        {showApiKey && <ApiKeyInput />}
+      </div>
     </div>
   );
 }

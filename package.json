@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "setup": "bash setup.sh",
+    "setup:win": "setup.bat"
   },
   "dependencies": {
     "@openrouter/sdk": "^0.9.11",

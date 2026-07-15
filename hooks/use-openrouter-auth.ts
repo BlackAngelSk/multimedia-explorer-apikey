@@ -26,6 +26,7 @@ export interface OpenRouterAuthContext {
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (callbackUrl?: string) => Promise<void>;
+  setApiKey: (key: string) => void;
   signOut: () => void;
   error: string | null;
 }
@@ -90,6 +91,7 @@ export function OpenRouterAuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: apiKey !== null,
     isLoading,
     signIn,
+    setApiKey: storeApiKey,
     signOut,
     error,
   };
