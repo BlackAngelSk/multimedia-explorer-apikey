@@ -11,7 +11,7 @@ echo ========================================
 echo.
 
 REM ---- Step 1: Check if bun is installed ----
-echo [1/4] Checking for bun...
+echo [1/5] Checking for bun...
 where bun >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -27,7 +27,7 @@ echo   OK bun found
 echo.
 
 REM ---- Step 2: Install dependencies ----
-echo [2/4] Installing dependencies...
+echo [2/5] Installing dependencies...
 if exist "node_modules" (
     echo   OK Dependencies already installed
 ) else (
@@ -41,8 +41,42 @@ if exist "node_modules" (
 )
 echo.
 
-REM ---- Step 3: Create .env file if missing ----
-echo [3/4] Checking environment configuration...
+REM ---- Step 3: Auto-update from GitHub ----
+echo [3/5] Checking for updates from GitHub...
+set REPO_URL=https://github.com/BlackAngelSk/multimedia-explorer-apikey.git
+if exist ".git" (
+    git fetch origin >nul 2>&1
+    for /f "tokens=*" %%a in ('git rev-parse HEAD') do set LOCAL=%%a
+    for /f "tokens=*" %%a in ('git rev-parse origin/main 2^>nul') do set REMOTE=%%a
+    if defined REMOTE (
+        if not "%LOCAL%"=="%REMOTE%" (
+            echo   New updates available. Pulling...
+            git stash >nul 2>&1
+            git pull origin main --quiet >nul 2>&1
+            if %ERRORLEVEL% EQU 0 (
+                echo   OK Updated to latest version
+                echo   Running bun install after update...
+                bun install >nul 2>&1
+                echo   OK Dependencies updated
+                git stash pop >nul 2>&1
+            ) else (
+                echo   ERROR Could not pull updates (merge conflict?)
+                echo   Continuing with local version
+                git stash pop >nul 2>&1
+            )
+        ) else (
+            echo   OK Already up to date
+        )
+    ) else (
+        echo   Could not check remote. Continuing with local version.
+    )
+) else (
+    echo   WARNING: Not a git repository - skipping update
+)
+echo.
+
+REM ---- Step 4: Create .env file if missing ----
+echo [4/5] Checking environment configuration...
 if exist ".env" (
     echo   OK .env file already exists
 ) else (
@@ -56,8 +90,8 @@ if exist ".env" (
 )
 echo.
 
-REM ---- Step 4: Start dev server ----
-echo [4/4] Starting development server...
+REM ---- Step 5: Start dev server ----
+echo [5/5] Starting development server...
 echo   Server will start at http://localhost:3000
 echo   Press Ctrl+C to stop
 echo.
